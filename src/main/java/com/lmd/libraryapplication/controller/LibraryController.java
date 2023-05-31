@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -34,7 +35,7 @@ public class LibraryController {
     }
 
     @GetMapping("/author/{id}")
-    public HttpEntity<AuthorDTO> getAuthorById (@PathVariable Integer id){
+    public HttpEntity<AuthorDTO> getAuthorById(@PathVariable Integer id) {
         AuthorDTO authorDTO = authorRepository.findById(id).get();
 //        authorDTO.add(linkTo(methodOn(LibraryController.class).getAuthorById(id)).withSelfRel());//gives link to self
         authorDTO.add(linkTo(methodOn(LibraryController.class).getAuthorById(id)).withRel("George Orwell"));//changes link name to String "George Orwell"
@@ -43,34 +44,34 @@ public class LibraryController {
 
 
     @GetMapping("/book/{id}")
-    public HttpEntity<BookDTO> getBookById (@PathVariable Integer id){
-        BookDTO bookDTO =bookRepository.findById(id).get();
+    public HttpEntity<BookDTO> getBookById(@PathVariable Integer id) {
+        BookDTO bookDTO = bookRepository.findById(id).get();
+        Map<String,Integer> map = bookRepository.getAuthorIdByBookId(id);
+        bookDTO.add(linkTo(methodOn(LibraryController.class).getAuthorById(map.get("author_id"))).withRel("author"));
         bookDTO.add(linkTo(methodOn(LibraryController.class).getBookById(id)).withSelfRel());//gives link to self
 //        bookDTO.add(linkTo(methodOn(LibraryController.class).getBookById(id)).withRel("George Orwell"));//changes link name to String "George Orwell"
         return new ResponseEntity<>(bookDTO, HttpStatus.OK);
     }
 
     @GetMapping("/author/{id}/books")
-    public CollectionModel<BookDTO> getAllBooksByAuthorId(@PathVariable Integer id){
-        List<BookDTO> books= authorRepository.findById(id).get().getBooks();
-        for (BookDTO bookDTO: books){
+    public CollectionModel<BookDTO> getAllBooksByAuthorId(@PathVariable Integer id) {
+        List<BookDTO> books = authorRepository.findById(id).get().getBooks();
+        for (BookDTO bookDTO : books) {
             Link link = linkTo(methodOn(LibraryController.class).getBookById(bookDTO.getId())).withSelfRel();
             bookDTO.add(link);
         }
         Link link2 = linkTo(methodOn(LibraryController.class).getAllBooksByAuthorId(id)).withSelfRel();
-        return CollectionModel.of(books,link2);
+        return CollectionModel.of(books, link2);
     }
-
     @GetMapping("/authors")
-    public CollectionModel<AuthorDTO> getAllAuthors(){
+    public CollectionModel<AuthorDTO> getAllAuthors() {
         List<AuthorDTO> authors = authorRepository.findAll();
-        for(AuthorDTO authorDTO: authors){
+        for (AuthorDTO authorDTO : authors) {
             authorDTO.add(linkTo(methodOn(LibraryController.class).getAuthorById(authorDTO.getId())).withSelfRel());
             authorDTO.add(linkTo(methodOn(LibraryController.class).getAllBooksByAuthorId(authorDTO.getId())).withRel("books"));
         }
         return CollectionModel.of(authors, linkTo(LibraryController.class).withSelfRel());
     }
-
 
 
 }

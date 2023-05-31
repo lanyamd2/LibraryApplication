@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.lmd.libraryapplication.model.dtos.AuthorDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import org.springframework.hateoas.RepresentationModel;
 
 @Entity
 @Table(name = "books")
-public class BookDTO {
+public class BookDTO extends RepresentationModel<BookDTO> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "book_id", nullable = false)

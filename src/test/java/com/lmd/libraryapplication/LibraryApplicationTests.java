@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -30,6 +31,16 @@ class LibraryApplicationTests {
 	@Autowired
 	BookService bookService;
 
+	@Test
+	@DisplayName("Using WebClient ")
+	void usingWebClient(){
+		String response=WebClient.create("http://localhost:8080/authors")
+				.get()
+				.retrieve()
+				.toString();
+
+		System.out.println(response);
+	}
 	@Test
 	@DisplayName("test author endpoint")
 	void testAuthorEndpoint(){

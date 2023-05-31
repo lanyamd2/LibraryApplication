@@ -2,12 +2,13 @@ package com.lmd.libraryapplication.model.dtos;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.util.List;
 
 @Entity
 @Table(name = "authors")
-public class AuthorDTO {
+public class AuthorDTO extends RepresentationModel<AuthorDTO> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "author_id", nullable = false)
